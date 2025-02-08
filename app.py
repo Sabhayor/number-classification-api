@@ -15,12 +15,14 @@ def is_prime(n):
     return True
 
 def is_perfect(n):
-    """Check if a number is a perfect number."""
+    """Check if a number is a perfect number (excluding 0)."""
+    if n <= 0:  # Ensuring 0 is not considered perfect
+        return False
     return n == sum(i for i in range(1, n) if n % i == 0)
 
 def is_armstrong(n):
     """Check if a number is an Armstrong number."""
-    digits = [int(d) for d in str(n)]
+    digits = [int(d) for d in str(abs(n))]  # Use absolute value for calculation
     power = len(digits)
     return n == sum(d**power for d in digits)
 
@@ -29,11 +31,11 @@ def classify_number():
     """Classify a number and return its properties."""
     number = request.args.get('number')
 
-    # Validate input
-    if not number.isdigit():
+    try:
+        num = float(number) if '.' in number else int(number)  # Support floats
+    except ValueError:
         return jsonify({"number": number, "error": True}), 400
-    
-    num = int(number)
+
     properties = []
     
     # Check properties
@@ -58,7 +60,7 @@ def classify_number():
         "is_prime": is_prime(num),
         "is_perfect": is_perfect(num),
         "properties": properties,
-        "digit_sum": sum(int(d) for d in str(num)),
+        "digit_sum": sum(int(d) for d in str(abs(num)) if d.isdigit()),  # Handle negative numbers
         "fun_fact": fun_fact
     }
 
